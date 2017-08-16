@@ -1,0 +1,295 @@
+﻿@model IMDB.Web.Models.MovieViewModel
+@using IMDB.Web.Models
+
+@{
+    ViewBag.Title = "Add Movie";
+}
+
+
+
+<div class="container">
+
+    @using (Html.BeginForm("AddMovie", "Movie", FormMethod.Post, new { id = "frmSaveMovie", @class = "well form-horizontal", enctype = "multipart/form-data" }))
+    {
+        <fieldset>
+            <legend>Add the movie!</legend>
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Movie Name</label>
+                <div class="col-md-4 inputGroupContainer">
+                    <div class="input-group">
+                        @Html.EditorFor(model => model.MoviesName, new { htmlAttributes = new { @class = "form-control", @placeholder = "Movie Name", @name = "name" } })
+                        @*@Html.ValidationMessageFor(model => model.MoviesName, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Year Of release</label>
+                <div class="col-md-4 inputGroupContainer">
+                    <div class="input-group">
+                        @Html.EditorFor(model => model.YOR, new { htmlAttributes = new { @class = "form-control", @placeholder = "Year of release", @name = "yor" } })
+                        @*@Html.ValidationMessageFor(model => model.YOR, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Plot</label>
+                <div class="col-md-4 inputGroupContainer">
+                    <div class="input-group">
+                        @Html.EditorFor(model => model.Plot, new { htmlAttributes = new { @class = "form-control", @placeholder = "Plot", @name = "plot" } })
+                        @*@Html.ValidationMessageFor(model => model.Plot, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Poster</label>
+                <div class="col-md-4 inputGroupContainer">
+                    <div class="input-group">
+                        <input type="file" id="fileUpload" name="fileUpload" size="23" class="form-control" accept="image/png, image/jpeg" />
+                        @*@Html.ValidationMessageFor(model => model.Poster, "", new { @class = "text-danger" })*@
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Producer</label>
+                <div class="col-md-4 selectContainer">
+                    <div class="input-group">
+                        @Html.DropDownListFor(m => m.ProducerId, Model.Producers, "Please Select Producer", new { htmlAttributes = new { @class = "form-control selectpicker" } })
+                        @*@Html.ValidationMessageFor(model => model.ProducerId, "", new { @class = "text-danger" })*@
+
+                        <button type="button" class="btn btn-info" id="addProducer">
+                            <span class="glyphicon glyphicon-plus-sign pull-right"></span> Add Producer
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-md-4 control-label">Select Actors</label>
+
+                <button type="button" class="btn btn-info" id="addActor">
+                    <span class="glyphicon glyphicon-plus-sign pull-right"></span> Add Actor
+                </button>
+                <div class="col-md-4 selectContainer">
+                    <div class="input-group">
+                        <div id="js-actors">
+                            @if (Model.Actors?.Count > 0)
+                            {
+
+                                foreach (var item in Model.Actors)
+                                {
+                                    <div class="checkbox">
+                                        <label>
+                                            <input type="checkbox"
+                                                   name="SelectedActors"
+                                                   value="@item.Value" /> @item.Text
+                                            </label>
+                                        </div>
+                                }
+
+                            }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label class="col-md-4 control-label"></label>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-warning">Save <span class="glyphicon glyphicon-send"></span></button>
+                </div>
+            </div>
+
+        </fieldset>
+    }
+</div>
+
+
+<div class="modal fade" id="actorModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Actor</h4>
+            </div>
+            <div class="modal-body">
+                @{ Html.RenderPartial("_AddActor", new ActorViewModel());}
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeActorModal" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="saveActor" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="producerModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Producer</h4>
+            </div>
+            <div class="modal-body">
+                @{ Html.RenderPartial("_AddProducer", new ProducerViewModel());}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" id="closeProducerModal" data-dismiss="modal">Close</button>
+                <button type="button" id="saveProducer" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts
+{
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+
+    <script type="text/javascript">
+
+        // for actor modal
+        $(function () {
+            var url = '@Url.Action("AddActor", "Actor")';
+
+            $('#addActor').click(function () {
+                $('#actorModel').modal('toggle');
+            })
+
+
+            var items = [];
+            var data = {};
+            $("#errorActor").hide();
+            $('#saveActor').on('click', function onSave() {
+                data.ActorName = $('#js-actor-name').val();
+                data.DOB = $('#js-actor-dob').val();
+                data.Bio = $('#Bio').val();
+                data.gender = $('#Gender Option:selected').text();
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: data,
+                }).success(function (result) {
+                    if (result > 1) {
+                        $('#actorModel').modal('toggle');
+                        var template = '<div class="checkbox">' + '<label>' +
+                            '<input type="checkbox"' +
+                                    'name="SelectedActors"' +
+                                    'value="' + result + '"></input>' + data.ActorName + '</label>' + ' </div>';
+                    }
+                    else {
+                        $("#errorActor").show();
+                        for (var i = 0, error = result; i < error.length; i++) {
+                            items.push('<li style="color: #b94a48">' + error[i] + '</li>')
+                        };
+                        $('#errorDisplayActor').append(items.join(''));
+                    }
+
+                    $('#js-actors').append(template);
+                    $('#js-actor-name').val("");
+                    $('#js-actor-dob').val("");
+                    $('#Bio').text("");
+
+                }).error(function (error) {
+
+                });
+            })
+        })
+
+        $('#closeActorModal').on('click', function onSave() {
+            $("#errorActor").hide();
+            $('#errorDisplayActor').html("");
+        })
+
+
+
+
+        // for producer modal
+        $(function () {
+            var url = '@Url.Action("AddProducer", "Producer")';
+            $("#errorProducer").hide();
+            $('#addProducer').click(function () {
+                $('#errorDisplayProducer').text("");
+                $('#producerModel').modal('toggle');
+            })
+
+            var items = [];
+            var ProducerData = {};
+
+            $('#saveProducer').on('click', function onSave(e) {
+
+                ProducerData.ProducerName = $('#js-producer-name').val();
+                ProducerData.ProducerDOB = $('#js-producer-dob').val();
+                ProducerData.ProducerBio = $('#ProducerBio').val();
+                ProducerData.ProducerGender = $('#ProducerGender Option:selected').text();
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: ProducerData,
+                }).success(function (result) {
+
+                    if (result > 0) {
+                        $('#producerModel').modal('toggle');
+                        $("#ProducerId").append($("<option     />").val(result).text(ProducerData.ProducerName));
+                        $('#errorDisplayProducer').html("");
+                    } else {
+
+                        $("#errorProducer").show();
+                        for (var i = 0, error = result; i < error.length; i++) {
+                            items.push('<li style="color: #b94a48">' + error[i] + '</li>')
+                        };
+                        $('#errorDisplayProducer').append(items.join(''));
+                    }
+                    $('#js-producer-name').val("");
+                    $('#js-producer-dob').val("");
+                    $('#ProducerBio').val("");
+
+                }).error(function (error) {
+
+                });
+            })
+        });
+
+
+        $('#closeProducerModal').on('click', function onSave() {
+            $("#errorProducer").hide();
+            $('#errorDisplayProducer').text("");
+        })
+
+        $(function () {
+            $("#js-actor-dob").datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+        $(function () {
+            $("#js-producer-dob").datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+
+
+        // only year
+
+        $(function () {
+        
+            $('#YOR').datepicker({ dateFormat: 'yy' })
+        });
+       
+    </script>
+}
+<style>
+    /*.ui-datepicker-calendar { display: none; }*/
+</style>

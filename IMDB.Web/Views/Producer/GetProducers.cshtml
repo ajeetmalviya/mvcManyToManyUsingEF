@@ -1,0 +1,139 @@
+﻿@model IEnumerable<IMDB.Web.Models.ProducerViewModel>
+@using IMDB.Web.Models
+@{
+    ViewBag.Title = "Get Producers";
+}
+<br />
+<br />
+<input type="button" id="addProducer" value="Add Producer" class="btn btn-success" />
+
+<div style="padding:20px;">
+</div>
+@if (Model.Count() > 0)
+{
+    <div class="container">
+
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="table-responsive">
+                    <table class="table table-inverse">
+                        <thead>
+                            <tr>
+                                <th>Producer Name</th>
+                                <th>DOB</th>
+                                <th>Bio</th>
+                                <th>Gender</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProducerName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProducerDOB)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProducerBio)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.ProducerGender)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{   <div style="background-color: #F5F5DC; height: 170px;">
+        <div style="padding:20px;">
+            <h3>
+                No Producer, You have not added any Producer yet.
+            </h3>
+            <h4>
+                Kindly add the Producer and try again !
+            </h4>
+        </div>
+    </div>
+}
+
+<div class="modal fade" id="producerModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Add Actor</h4>
+            </div>
+            <div class="modal-body">
+                @{ Html.RenderPartial("_AddProducer", new ProducerViewModel());}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" id="saveProducer" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var url = '@Url.Action("AddProducer", "Producer")';
+
+            $('#addProducer').click(function () {
+                $('#errorDisplayProducer').text("");
+                $('#producerModel').modal('toggle');
+            })
+
+            var items = [];
+            var ProducerData = {};
+            $('#saveProducer').on('click', function onSave() {
+                ProducerData.ProducerName = $('#js-producer-name').val();
+                ProducerData.ProducerDOB = $('#js-producer-dob').val();
+                ProducerData.ProducerBio = $('#ProducerBio').val();
+                ProducerData.ProducerGender = $('#ProducerGender Option:selected').text();
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: ProducerData,
+                }).success(function (result) {
+                    if (result > 0) {
+                        $('#producerModel').modal('toggle');
+                        $('#js-producer-name').val("");
+                        $('#js-producer-dob').val("");
+                        $('#ProducerBio').text("");
+                        location.href = '@Url.Action("GetProducers", "Producer")';
+                        $('#errorDisplayProducer').text("");
+                    }
+                    else {
+                        $("#errorProducer").show();
+                        for (var i = 0, error = result; i < error.length; i++) {
+                            items.push('<li style="color: #b94a48">' + error[i] + '</li>')
+                        };
+                        $('#errorDisplayProducer').append(items.join(''));
+                    }
+                }).error(function (error) {
+
+                });
+            })
+        });
+
+        $(function () {
+            $("#js-producer-dob").datepicker({
+                dateFormat: 'yy-mm-dd'
+            });
+        });
+
+    </script>
+}

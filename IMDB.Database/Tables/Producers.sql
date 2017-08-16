@@ -1,0 +1,8 @@
+﻿CREATE TABLE [dbo].[Producers]
+(
+	[ProducerId] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
+	[ProducerName] NVARCHAR(100) NOT NULL,
+	[Gender] NVARCHAR(10) NOT NULL,
+	[DOB] DATE NULL,
+	[Bio] NVARCHAR(1000) NULL
+)
